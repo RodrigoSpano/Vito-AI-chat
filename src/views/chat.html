@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 1rem;
+        }
+
+        #prompt {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #response {
+            border: 1px solid #ccc;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            min-height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Ask to Vito-AI</h2>
+    <form id="chat-form">
+        <textarea id="prompt-input" rows="3" placeholder="Ask something..."></textarea><br />
+        <button type="submit" id="ask-btn">Ask</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        const vscode = acquireVsCodeApi(); // allows bidirectional communication between the webview and the extension's backend
+
+        const chatForm = document.getElementById('chat-form')
+        const promptInput = document.getElementById('prompt-input')
+
+
+        chatForm.addEventListener('submit', (ev) => {
+            ev.preventDefault()
+            const text = promptInput.value;
+            if (!text) return;
+            vscode.postMessage({ command: 'prompt', text });
+            promptInput.value = '';
+        });
+
+        window.addEventListener('message', event => {
+            const message = event.data;
+            if (message.command === 'prompt-response') {
+                document.getElementById('response').innerText = message.text;
+            }
+        });
+
+    </script>
+</body>
+
+</html>
