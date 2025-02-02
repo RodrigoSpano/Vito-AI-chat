@@ -79,6 +79,12 @@
             color: darkgrey;
         }
 
+        #thinking {
+            font-weight: bold;
+            color: #ccc;
+            display: none;
+        }
+
         #ask-btn {
             height: 50px;
             width: 100px;
@@ -100,6 +106,7 @@
             </div>
 
             <form id="chat-form">
+                <span id="thinking">Thinking... please wait</span>
                 <textarea id="prompt-input" rows="2" placeholder="Ask something..."></textarea>
                 <button type="submit" id="ask-btn">Ask</button>
             </form>
@@ -129,7 +136,15 @@
                 // document.getElementById('response').innerText = message.text;
                 responseContainer.innerHTML += `<div class="response-text-container"><span class="text">${JSON.stringify(message)}</span></div>`
             }
+            if (message.command === 'thinking') {
+                if (message.state) {
+                    document.getElementById('thinking').style.display = 'block';
+                } else {
+                    document.getElementById('thinking').style.display = 'none';
+                }
+            }
         });
+
 
     </script>
 </body>

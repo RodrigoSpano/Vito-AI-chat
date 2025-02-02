@@ -20,6 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// receive message from webview
 		panel.webview.onDidReceiveMessage(async (message: IMessage) => {
 			if (message.command === 'prompt') {
+				handleThinking(true) // send to ui that AI is thinking
 				const response = await ollama.chat({
 					model: ollamaModel,
 					messages: [{role: "user", content: message.text }],
@@ -29,17 +30,22 @@ export function activate(context: vscode.ExtensionContext) {
 				// send streamed response to webview
 				let returnMessageBody: IChatResponse = {prompt: message.text, answer: ''};
 				let streamedResponse = ''
+
 				for await (const part of response) {
 					streamedResponse += part.message.content
 					// panel.webview.postMessage({command: 'prompt-response', text: streamedResponse})
 				}
 				returnMessageBody.answer = streamedResponse;
-				panel.webview.postMessage({command: 'prompt-response', body: returnMessageBody})
+				panel.webview.postMessage({command: 'prompt-response', body: returnMessageBody}).then(() => handleThinking(false))
 			}
 			
-
 		})
-		
+		// ends on did receive message
+
+		function handleThinking(state: boolean) {
+			panel.webview.postMessage({command: 'thinking', state})
+		}
+
 	})
 
 	context.subscriptions.push(disposable)

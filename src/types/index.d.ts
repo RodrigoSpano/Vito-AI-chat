@@ -1,4 +1,4 @@
-export type TCommands = "prompt" | "prompt-response"
+export type TCommands = "prompt" | "prompt-response" | 'thinking'
 
 export interface IChatResponse {
   prompt: string
