@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs'
-import ollama, { type ChatResponse } from 'ollama'
-import { TCommands, type IMessage } from './types';
+import ollama from 'ollama'
+import { IChatResponse, type IMessage } from './types';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -27,12 +27,14 @@ export function activate(context: vscode.ExtensionContext) {
 				})
 
 				// send streamed response to webview
+				let returnMessageBody: IChatResponse = {prompt: message.text, answer: ''};
 				let streamedResponse = ''
 				for await (const part of response) {
 					streamedResponse += part.message.content
-					panel.webview.postMessage({command: 'prompt-response', text: streamedResponse})
+					// panel.webview.postMessage({command: 'prompt-response', text: streamedResponse})
 				}
-				
+				returnMessageBody.answer = streamedResponse;
+				panel.webview.postMessage({command: 'prompt-response', body: returnMessageBody})
 			}
 			
 
